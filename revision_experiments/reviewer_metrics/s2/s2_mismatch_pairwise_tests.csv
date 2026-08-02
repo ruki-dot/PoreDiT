@@ -1,0 +1,2 @@
+﻿dataset_a,dataset_b,metric,n_a,n_b,mean_a,mean_b,sd_a,sd_b,mean_diff_a_minus_b,mean_diff_ci95_low,mean_diff_ci95_high,ks_D,ks_p,mwu_U,mwu_p,cohen_d,hedges_g,cliffs_delta
+GT_leave_one_out_baseline,Gen_to_GTmean,S2_mismatch_NRMSE_percent,216,100,3.592131613684714,83.84436604597403,2.8158702923173617,1.8651946353225608,-80.25223443228931,-80.77312747791841,-79.72544033350171,1.0,9.095159902534558e-85,0.0,2.2922120092380752e-46,-31.414640964425637,-31.339546205148128,-1.0

@@ -1,0 +1,11 @@
+{
+  "method": "PoreSpy SNOW2 pore-network extraction",
+  "cn_definition": "number of throats incident to each extracted pore node",
+  "cleaning": {
+    "function": "skimage.morphology.remove_small_objects",
+    "min_size": 34,
+    "connectivity": 3
+  },
+  "gt_dir": "../dataset/NPY/Bentheimer",
+  "gen_dir": "../samples/Bentheimer/resolution_256/phi_cond_samples"
+}

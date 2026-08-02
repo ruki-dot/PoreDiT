@@ -1,0 +1,13 @@
+Name: Gen_512
+SampleDir: C:\Users\黄意卓\Desktop\rock\code\samples\Bentheimer\resolution_512\phi_cond_512_calibrated
+ShapeZ: 512
+ShapeY: 512
+ShapeX: 512
+TotalVoxels: 134217728
+Phi_black_pore_raw: 0.2700818181037903
+Phi_auto_raw: 0.2700818181037903
+Phi_clean_min_size: 
+Phi_LCC: 0.267796128988266
+TotalPore_auto: 36249768
+LargestClusterPore: 35942988
+LargestClusterFraction: 0.9915370492853913

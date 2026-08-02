@@ -1,0 +1,53 @@
+# Python/cache artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Local environments
+.venv/
+venv/
+env/
+.env
+
+# Logs and temporary outputs
+*.log
+*.tmp
+*.temp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Review-only or local package files; do not upload to GitHub
+code.zip
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.docx
+~$*.docx
+
+# Large local data/model/generated artifacts
+# Keep these on Figshare/Zenodo/GitHub Releases or local storage, not normal Git.
+dataset/
+checkpoints/
+samples/
+output/
+
+# Extra guardrails for accidentally copied large scientific artifacts
+*.raw
+*.npy
+*.npz
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.hdf5
+*.nii
+*.nii.gz
+*.tif
+*.tiff

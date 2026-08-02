@@ -1,0 +1,13 @@
+Name: Gen_1024
+SampleDir: C:\Users\黄意卓\Desktop\rock\code\samples\Bentheimer\resolution_1024\phi_cond_1024_calibrated_final
+ShapeZ: 1024
+ShapeY: 1024
+ShapeX: 1024
+TotalVoxels: 1073741824
+Phi_black_pore_raw: 0.27250363770872355
+Phi_auto_raw: 0.27250363770872355
+Phi_clean_min_size: 
+Phi_LCC: 0.27112352289259434
+TotalPore_auto: 292598553
+LargestClusterPore: 291116666
+LargestClusterFraction: 0.9949354260818918

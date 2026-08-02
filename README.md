@@ -1,46 +1,65 @@
-# The source code and datasets for the paper 'PoreDiT: A Scalable Generative Model for Large-Scale Digital Rock Reconstruction Using 3D Swin Transformers' will be released in this repository upon the acceptance of the manuscript.
-
 # PoreDiT: A Scalable Generative Model for Large-Scale Digital Rock Reconstruction Using 3D Swin Transformers
 
-This repository contains the official PyTorch implementation of the paper: **PoreDiT: "A Scalable Generative Model for Large-Scale Digital Rock
-Reconstruction Using 3D Swin Transformers"**.
+This repository contains the PyTorch implementation for **PoreDiT: A Scalable Generative Model for Large-Scale Digital Rock Reconstruction Using 3D Swin Transformers**.
 
-## 📝 Abstract
+PoreDiT reconstructs 3D digital rock pore structures with a 3D Swin-Transformer diffusion backbone. Large domains such as 512^3 and 1024^3 are reconstructed by tiled/sliding-window inference with Global Coherent Noise and overlap-weighted fusion, rather than by single-pass end-to-end gigavoxel generation.
 
-Digital rock physics (DRP) relies heavily on high-resolution 3D pore structure reconstruction. Traditional methods often struggle with the trade-off between resolution and field of view (FOV). We propose a **Dual-Scale Diffusion Model** that utilizes a Coarse-to-Fine generation strategy. This method can generate high-fidelity porous media structures at arbitrary scales (e.g., 256³, 512³, 1024³) while maintaining morphological consistency and physical properties (permeability, porosity).
+## Repository Scope
 
-## 📂 Project Structure
+This GitHub repository is intended for source code, preprocessing scripts, evaluation scripts, and reproducibility instructions. Large binary artifacts are intentionally excluded from normal Git history:
 
-Please organize your directory as follows:
+- `dataset/`: raw and processed micro-CT volumes
+- `checkpoints/`: pretrained `.pth` weights and checkpoint archives
+- `samples/`: generated `.npy` volumes and image exports
+- `output/`: local training/evaluation outputs
+- `code.zip` and review-only `.docx` files
+
+The complete peer-review reproduction package, including source code, model weights, and data, is available via the Figshare private review link used in the manuscript: <https://figshare.com/s/e61d63b6c3d431635898>. The public GitHub repository listed in the manuscript is <https://github.com/ruki-dot/PoreDiT>.
+
+## Project Structure
 
 ```text
 code/
-├── checkpoints/          # Pre-trained models
-│   ├── Bentheimer/
-│   │   └── epoch_0300.pth
-│   └── Ketton/
-│       └── epoch_0300.pth
-├── dataset/              # Data root
-│   ├── raw/              # Original raw images
-│   └── NPY/              # Processed .npy files (Bentheimer & Ketton)
-├── samples/              # Generated results
-├── src/                  # Source code for training and sampling
-├── processing/           # Data preprocessing scripts
-├── evaluation/           # Evaluation metrics (Permeability & Diversity)
-└── requirements.txt      # Environment dependencies
+|-- src/                         # Training and sampling scripts
+|   |-- train_bentheimer.py
+|   |-- train_ketton.py
+|   |-- sample_bentheimer_256.py
+|   |-- sample_bentheimer_tiled.py
+|   `-- sample_ketton.py
+|-- preprocessing/
+|   `-- prepare_dataset.py
+|-- evaluation/                  # Morphological, statistical, and physics metrics
+|   |-- eval_porosity.py
+|   |-- eval_surface_area.py
+|   |-- eval_euler.py
+|   |-- eval_s2.py
+|   |-- eval_permeability.py
+|   |-- eval_permeability_xyz.py
+|   |-- eval_connectivity_large.py
+|   |-- eval_coordination_number.py
+|   `-- eval_diversity.py
+|-- revision_experiments/         # Additional scripts/results used during revision
+|-- dataset/                      # Local data only; not committed
+|-- checkpoints/                  # Local pretrained weights only; not committed
+|-- samples/                      # Generated samples only; not committed
+|-- output/                       # Training/evaluation outputs only; not committed
+|-- requirements.txt
+`-- README.md
 ```
 
-## 🛠️ Environment Setup
-We recommend using Anaconda or Miniconda to manage the environment.
-1.Create a new environment:
-```bash
-conda create -n rock_diffusion python=3.8
-conda activate rock_diffusion
-```
-2.Install dependencies: Create a file named  `requirements.txt` with the content below, then run  `pip install -r requirements.txt` to install the dependencies.
+## Environment Setup
 
-requirements.txt content:
+We recommend Anaconda or Miniconda.
+
 ```bash
+conda create -n poredit python=3.8
+conda activate poredit
+pip install -r requirements.txt
+```
+
+Core dependencies are listed in `requirements.txt`:
+
+```text
 torch>=1.10.0
 torchvision>=0.11.0
 numpy
@@ -53,44 +72,39 @@ tqdm
 Pillow
 ```
 
-## 💾 Data Preparation
+## Data Preparation
 
-The project supports two modes for data preparation: using the provided pre-processed datasets or processing your own raw micro-CT images.
+The project supports either processed binary `.npy` files or custom raw micro-CT volumes. Large data files are not committed to this repository. Download the reproduction package from Figshare or prepare your own data locally.
 
-### Option A: Use Provided Pre-processed Data (Ready to Use)
-We have already processed and placed the binary dataset files in the `dataset/NPY/` directory. 
-* **Bentheimer Sandstone:** Available in `dataset/NPY/Bentheimer`
-* **Ketton Limestone:** Available in `dataset/NPY/Ketton`
+Expected local layout:
 
-These files are pre-converted to binary format (0 for grain, 1 for pore) and are ready for training or evaluation immediately. No further action is required.
+```text
+dataset/
+|-- Raw/
+|   `-- Bentheimer_2d25um_binary.raw
+`-- NPY/
+    |-- Bentheimer/
+    `-- Ketton/
+```
 
-### Option B: Process Custom Raw Data
-If you wish to train on your own Digital Rock Physics (DRP) data, please follow these steps:
+Example preprocessing command:
 
-1.  **Prepare Raw Data:** Place your raw micro-CT volume files into `dataset/raw/`. 
-    * *Note: We recommend using raw volumes with dimensions approximating $1000^3$ voxels for optimal sub-volume extraction.*
+```bash
+python preprocessing/prepare_dataset.py \
+  --raw_file "./dataset/Raw/Bentheimer_2d25um_binary.raw" \
+  --output_dir "./dataset/NPY/Bentheimer" \
+  --dims 1000 1000 1000 \
+  --sample_dim 256 \
+  --stride 128 \
+  --augment
+```
 
-2.  **Run Preprocessing:**
-    Run the script to convert raw images into binary `.npy` volumes and perform data splitting.
-    ```bash
-    # Data Preprocessing (Example for Bentheimer)
-    python preprocessing/prepare_dataset.py \
-      --raw_file "./dataset/Raw/Bentheimer_2d25um_binary.raw" \
-      --output_dir "./dataset/NPY/Bentheimer" \
-      --dims 1000 1000 1000 \
-      --sample_dim 256 \
-      --stride 128 \
-      --augment
-    ```
-    The script will automatically process the raw files and populate the `dataset/NPY/` directory.
+Binary convention: grain = 0, pore = 1.
 
-## 🚀 Training
+## Training
 
-We demonstrate the training and sampling procedures using the representative samples discussed in our paper. Users may also employ their own datasets; for this purpose, we recommend using the `src/train_ketton.py` script as a baseline due to its enhanced generalization capabilities. The instructions below focus on reproducing the specific generated samples showcased in the manuscript.
+### Bentheimer Sandstone
 
-To train the models using the provided configurations:
-
-**Train Model (Bentheimer Example):**
 ```bash
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
 CUDA_VISIBLE_DEVICES=0,5 \
@@ -108,9 +122,10 @@ accelerate launch --num_processes=2 \
   --grad_loss_weight 0.008 \
   --cond_warmup_epochs 3 \
   --cfg_scale 1.0
-  ```
+```
 
-**Train Model (Ketton Example - Recommended for Custom Data)**:
+### Ketton Limestone
+
 ```bash
 CUDA_VISIBLE_DEVICES=3 accelerate launch \
   --num_processes=1 \
@@ -131,14 +146,19 @@ CUDA_VISIBLE_DEVICES=3 accelerate launch \
   --style_loss_weight 10.0 \
   --s2_lags 2 4 8 16 32 64 128 \
   --seed 42
-  ```
-The checkpoints will be automatically saved to the checkpoints/ directory upon completion.
+```
 
-## ⚡ Sampling
-The following commands allow you to reproduce the generated samples and reconstruction results presented in the paper using the pre-trained models.
+## Sampling
 
-### 1.Bentheimer Sandstone (Standard 256³ Generation)
-Generates samples with specific target porosity conditions.
+Place pretrained weights locally before sampling:
+
+```text
+checkpoints/Bentheimer/epoch_0300.pth
+checkpoints/Ketton/epoch_0300.pth
+```
+
+### Bentheimer 256^3 Conditional Generation
+
 ```bash
 CUDA_VISIBLE_DEVICES=0 python src/sample_bentheimer_256.py \
   --ckpt_path "./checkpoints/Bentheimer/epoch_0300.pth" \
@@ -151,8 +171,10 @@ CUDA_VISIBLE_DEVICES=0 python src/sample_bentheimer_256.py \
   --seed 1234
 ```
 
-### 2.Bentheimer Large-Scale (Tiled Generation 512³ / 1024³)
-Demonstrates the scalability of the model using tiled sampling strategies.
+### Bentheimer Large-Scale Tiled Reconstruction
+
+512^3 example:
+
 ```bash
 CUDA_VISIBLE_DEVICES=1 python src/sample_bentheimer_tiled.py \
   --ckpt_path "./checkpoints/Bentheimer/epoch_0300.pth" \
@@ -161,6 +183,9 @@ CUDA_VISIBLE_DEVICES=1 python src/sample_bentheimer_tiled.py \
   --full_size 512 \
   --timesteps 1000
 ```
+
+1024^3 example:
+
 ```bash
 CUDA_VISIBLE_DEVICES=1 python src/sample_bentheimer_tiled.py \
   --ckpt_path "./checkpoints/Bentheimer/epoch_0300.pth" \
@@ -170,7 +195,8 @@ CUDA_VISIBLE_DEVICES=1 python src/sample_bentheimer_tiled.py \
   --timesteps 1000
 ```
 
-### 3.Ketton Limestone (192³ Generation)
+### Ketton 192^3 Generation
+
 ```bash
 CUDA_VISIBLE_DEVICES=3 NCCL_P2P_DISABLE=1 NCCL_IB_DISABLE=1 python src/sample_ketton.py \
   --data_dir "./dataset/NPY/Ketton" \
@@ -186,39 +212,34 @@ CUDA_VISIBLE_DEVICES=3 NCCL_P2P_DISABLE=1 NCCL_IB_DISABLE=1 python src/sample_ke
   --mixed_precision fp16
 ```
 
-## 📊 Evaluation & Physics Metrics
-We provide standalone scripts to reproduce the metric evaluations reported in the paper. These scripts operate on the generated samples in `samples/` and compare them against the training data in `dataset/`.
+## Evaluation
 
-### 1. Porosity Verification
-Verifies if the generated samples match the target porosity distribution.
+Porosity:
+
 ```bash
 python evaluation/eval_porosity.py --sample_dir "./samples/Bentheimer/resolution_256/phi_cond_samples"
 ```
 
-### 2. Specific Surface Area (SSA)
-Calculates the specific surface area, a critical morphological metric for reaction kinetics.
+Specific surface area:
+
 ```bash
 python evaluation/eval_surface_area.py
 ```
-### 3. Euler Characteristic (Topology)
-Computes the Euler characteristic density to evaluate the topological connectivity and complexity of the pore network.
+
+Euler characteristic:
+
 ```bash
 python evaluation/eval_euler.py
 ```
 
-### 4.Two-Point Correlation Function ($S_2$)
-Computes the two-point correlation function $S_2(r)$ to assess the spatial structure and statistical equivalence of the generated media.
+Two-point correlation function:
+
 ```bash
 python evaluation/eval_s2.py
 ```
 
-### 5.Absolute Permeability (LBM)
+Absolute permeability:
 
-Calculates the absolute permeability ($K$) using a D3Q19 Lattice Boltzmann Method (LBM) solver implemented in PyTorch (GPU-accelerated).
-
-**Logic:** Uses Darcy's Law implementation with D3Q19 BGK collision model.
-
-**Target:** samples/Bentheimer/resolution_256/phi_cond_samples
 ```bash
 CUDA_VISIBLE_DEVICES=0 python evaluation/eval_permeability.py \
   --sample_dir "./samples/Bentheimer/resolution_256/phi_cond_samples" \
@@ -226,41 +247,41 @@ CUDA_VISIBLE_DEVICES=0 python evaluation/eval_permeability.py \
   --gpu 0
 ```
 
-The script automatically reads samples from the default sample directory and outputs `metric_permeability.txt`.
+Directional permeability:
 
-### 6.Diversity & Novelty Analysis
-Evaluates the generative diversity and checks for data leakage (memorization) by calculating the Distance to Nearest Neighbor (D_NN) via Hamming distance.
-
-**Logic**: Compares every generated sub-volume against the entire training dataset to find the closest real sample.
 ```bash
-CUDA_VISIBLE_DEVICES=0 python evaluation/eval_diversity.py
+CUDA_VISIBLE_DEVICES=0 python evaluation/eval_permeability_xyz.py
 ```
 
-### 7.Connectivity Analysis
-Analyzes the connected porosity ratio to ensure the generated pore networks are percolating (essential for fluid transport).
+Connectivity for large generated domains:
+
 ```bash
 python evaluation/eval_connectivity_large.py \
   --sample_dir "./samples/Bentheimer/resolution_1024/phi_cond_1024_calibrated_final"
 ```
 
-## 📥 Pre-trained Checkpoints
-We provide pre-trained weights for reproducibility. Ensure they are placed at:
+Diversity and nearest-neighbor novelty:
 
-`checkpoints/Bentheimer/epoch_0300.pth`
-
-`checkpoints/Ketton/epoch_0300.pth`
-
-## 📝 Citation
-If you use this code or dataset, please cite our paper:
+```bash
+CUDA_VISIBLE_DEVICES=0 python evaluation/eval_diversity.py
 ```
+
+## GitHub File-Size Notes
+
+Normal GitHub repositories warn at files larger than 50 MiB and block files larger than 100 MiB. This project contains several artifacts above that limit, including raw volumes and pretrained weights. Keep those files outside normal Git history and distribute them through Figshare, Zenodo, GitHub Releases, or Git LFS only if the storage quota is acceptable.
+
+The included `.gitignore` excludes the current `code.zip`, review-only `.docx`, `dataset/`, `checkpoints/`, `samples/`, and generated outputs so that the repository can be initialized and pushed as a code-only repository.
+
+## Citation
+
+If you use this code or dataset, please cite:
+
+```bibtex
 @article{HUANG2026PoreDiT,
   title={PoreDiT: A Scalable Generative Model for Large-Scale Digital Rock Reconstruction Using 3D Swin Transformers},
-  author={Huang Yizhuo and Baoquan Sun and Haibo Huang},
+  author={Huang Yizhuo and Sun Baoquan and Huang Haibo},
   journal={Computational Materials Science},
   year={2026},
   note={Submitted}
 }
 ```
-
-## ✉️ Contact
-For any questions regarding the code or the paper, please open an issue or contact [23307130266@m.fudan.edu.cn].

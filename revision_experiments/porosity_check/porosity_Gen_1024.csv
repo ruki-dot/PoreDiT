@@ -1,0 +1,2 @@
+﻿Name,SampleDir,ShapeZ,ShapeY,ShapeX,TotalVoxels,Phi_black_pore_raw,Phi_auto_raw,Phi_clean_min_size,Phi_LCC,TotalPore_auto,LargestClusterPore,LargestClusterFraction
+Gen_1024,C:\Users\黄意卓\Desktop\rock\code\samples\Bentheimer\resolution_1024\phi_cond_1024_calibrated_final,1024,1024,1024,1073741824,0.27250363770872355,0.27250363770872355,,0.27112352289259434,292598553,291116666,0.9949354260818918

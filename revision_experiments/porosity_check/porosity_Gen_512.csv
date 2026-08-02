@@ -1,0 +1,2 @@
+﻿Name,SampleDir,ShapeZ,ShapeY,ShapeX,TotalVoxels,Phi_black_pore_raw,Phi_auto_raw,Phi_clean_min_size,Phi_LCC,TotalPore_auto,LargestClusterPore,LargestClusterFraction
+Gen_512,C:\Users\黄意卓\Desktop\rock\code\samples\Bentheimer\resolution_512\phi_cond_512_calibrated,512,512,512,134217728,0.2700818181037903,0.2700818181037903,,0.267796128988266,36249768,35942988,0.9915370492853913
