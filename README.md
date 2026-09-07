@@ -280,7 +280,7 @@ If you use this code or dataset, please cite:
 @article{HUANG2026PoreDiT,
   title={PoreDiT: A Scalable Generative Model for Large-Scale Digital Rock Reconstruction Using 3D Swin Transformers},
   author={Huang Yizhuo and Sun Baoquan and Huang Haibo},
-  journal={Computational Materials Science},
+  journal={Results in Engineering},
   year={2026},
   note={Submitted}
 }
